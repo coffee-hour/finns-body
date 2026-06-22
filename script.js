@@ -13,7 +13,7 @@ let reaction = 0, rotationY = 0, frame = 0;
 let lastMessageId = 0;
 
 const POKE_INGEST_URL = "https://poke.com/api/v1/inbound/ingest/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4ZjBiMzc5ZC03MjU5LTQxODUtOGM4MC04MzcwNzY4MDdjNDkiLCJqdGkiOiI4MGE5ZWI3ZC01NTUzLTQ5ZDItYjU4OS02ZGVlZDYxZjI4NDkiLCJpYXQiOjE3ODIxNTgyNDIsImV4cCI6MjA5NzUxODI0Mn0.ejwYRs35Zjp1XvWsHufi6-TqvrjIud1lZrHDe_5KSpg";
-const WORKER_URL = "https://swingworker.xaviersgames.workers.dev/api/messages";
+const WORKER_URL = "https://cypherlink.xaviersgames.workers.dev/api/messages";
 
 const lerp = (a, b, n) => (1 - n) * a + n * b;
 const MESH = { vertices: [], faces: [] };
