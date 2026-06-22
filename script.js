@@ -1,5 +1,5 @@
 /**
- * CYPHER TERMINAL v15.0.0
+ * CYPHER TERMINAL v16.0.0
  * Masterclass Cyber-Skull Engine
  * High-Fidelity Anatomical Low-Poly Mesh
  */
@@ -16,25 +16,25 @@ const lerp = (a, b, n) => (1 - n) * a + n * b;
 
 const MESH = { vertices: [], faces: [] };
 
-function initRefinedSkull() {
+function initMasterclassSkull() {
     const v = MESH.vertices;
     const f = MESH.faces;
 
-    // 1. ANATOMICAL CRANIUM (Rounded hemisphere)
-    const rows = 6, cols = 8;
+    // 1. ANATOMICAL CRANIUM (Beautifully rounded)
+    const rows = 8, cols = 12;
     for(let r=0; r<=rows; r++) {
-        let phi = (r/rows) * (Math.PI/1.8); // Top half only
+        let phi = (r/rows) * (Math.PI/1.6); // Top half bulge
         for(let c=0; c<cols; c++) {
             let theta = (c/cols) * Math.PI * 2;
+            let radius = 0.88;
             v.push({
-                x: Math.sin(phi) * Math.cos(theta) * 0.85,
-                y: Math.cos(phi) * 0.8 + 0.3,
-                z: Math.sin(phi) * Math.sin(theta) * 0.85,
+                x: Math.sin(phi) * Math.cos(theta) * radius,
+                y: Math.cos(phi) * 0.85 + 0.35,
+                z: Math.sin(phi) * Math.sin(theta) * radius * 0.95,
                 type: 'bone'
             });
         }
     }
-    // Cranium Faces
     for(let r=0; r<rows; r++) {
         for(let c=0; c<cols; c++) {
             let i1 = r * cols + c, i2 = r * cols + (c+1)%cols;
@@ -43,29 +43,34 @@ function initRefinedSkull() {
         }
     }
 
-    // 2. FACIAL FEATURES (Fixed Indexing)
-    const base = v.length;
-    // Eye Sockets (Sunken)
-    v.push({x:0.3, y:0.2, z:0.6}, {x:-0.3, y:0.2, z:0.6}); // 0,1: Inner depths
-    v.push({x:0.45, y:0.4, z:0.85}, {x:-0.45, y:0.4, z:0.85}); // 2,3: Brow outer
-    v.push({x:0.45, y:0.0, z:0.85}, {x:-0.45, y:0.0, z:0.85}); // 4,5: Cheek top
-    // Nose Cavity
-    v.push({x:0, y:0.1, z:0.95}, {x:0.12, y:-0.15, z:0.9}, {x:-0.12, y:-0.15, z:0.9}); // 6,7,8
-    // Cheekbones (Zygomatic)
-    v.push({x:0.75, y:0.1, z:0.4}, {x:-0.75, y:0.1, z:0.4}); // 9,10
-    // Cyber-Jaw & Teeth
-    v.push({x:0.3, y:-0.5, z:0.7}, {x:-0.3, y:-0.5, z:0.7}); // 11,12: Top teeth row
-    v.push({x:0.2, y:-0.8, z:0.7}, {x:-0.2, y:-0.8, z:0.7}, {x:0, y:-0.85, z:0.8}); // 13,14,15: Chin
+    // 2. REFINED FACIAL MESH
+    const b = v.length;
+    // Eye Sockets (Deep Recess)
+    v.push({x:0.3, y:0.2, z:0.5}, {x:-0.3, y:0.2, z:0.5}); // 0,1: Deep Inner
+    v.push({x:0.45, y:0.45, z:0.85}, {x:-0.45, y:0.45, z:0.85}); // 2,3: Brow
+    v.push({x:0.45, y:-0.1, z:0.85}, {x:-0.45, y:-0.1, z:0.85}); // 4,5: Cheek top
+    v.push({x:0, y:0.2, z:0.9}); // 6: Bridge
+    
+    // Nose Cavity (Inverted Heart)
+    v.push({x:0, y:0, z:1.0}, {x:0.12, y:-0.2, z:0.95}, {x:-0.12, y:-0.2, z:0.95}); // 7,8,9
+    
+    // Cheekbones (Stylized Flare)
+    v.push({x:0.8, y:0.1, z:0.3}, {x:-0.8, y:0.1, z:0.3}); // 10,11
+    
+    // Jaw & Teeth (Segmented/Realistic protrusion)
+    v.push({x:0.25, y:-0.45, z:0.85}, {x:-0.25, y:-0.45, z:0.85}); // 12,13: Maxilla Teeth
+    v.push({x:0.22, y:-0.75, z:0.8}, {x:-0.22, y:-0.75, z:0.8}, {x:0, y:-0.85, z:0.88}); // 14,15,16: Chin
 
-    // Facial Faces
-    f.push([base+2, base+4, base+0], [base+3, base+1, base+5]); // Sockets
-    f.push([base+6, base+7, base+8]); // Nose
-    f.push([base+4, base+11, base+7], [base+5, base+8, base+12]); // Upper Jaw
-    f.push([base+11, base+13, base+15], [base+12, base+15, base+14]); // Lower Jaw/Chin
+    // Face Connectors
+    f.push([b+2, b+0, b+6], [b+3, b+6, b+1]); // Upper sockets
+    f.push([b+0, b+4, b+12], [b+1, b+13, b+5]); // Socket side to jaw
+    f.push([b+7, b+8, b+9]); // Nose
+    f.push([b+4, b+10, b+12], [b+5, b+13, b+11]); // Cheek flare
+    f.push([b+12, b+14, b+16], [b+13, b+16, b+15]); // Jaw/Chin structure
 
-    // 3. GYROSCOPIC RINGS
+    // 3. ENHANCED GYRO-RINGS (Precise Origin)
     const addRing = (radius, axis, speed) => {
-        const segs = 36;
+        const segs = 48;
         const start = v.length;
         for(let i=0; i<segs; i++) {
             let a = (i/segs)*Math.PI*2;
@@ -73,7 +78,7 @@ function initRefinedSkull() {
         }
         for(let i=0; i<segs; i++) f.push([start+i, start+(i+1)%segs, start+i]);
     };
-    addRing(1.8, 'Y', 1); addRing(2.1, 'X', -0.8); addRing(2.4, 'Z', 0.6);
+    addRing(1.8, 'Y', 1.0); addRing(2.1, 'X', -0.85); addRing(2.4, 'Z', 0.65);
 }
 
 const LIGHT = { x: 0.5, y: 0.5, z: 1.0 };
@@ -84,16 +89,16 @@ const normalize = (v) => {
 const nLight = normalize(LIGHT);
 
 function project(p) {
-    const scale = 230, dist = 6.0;
+    const scale = 240, dist = 6.2;
     let x = p.x, y = p.y, z = p.z;
     if(p.type === 'ring') {
-        let a = frame * 0.03 * p.speed;
+        let a = frame * 0.035 * p.speed;
         let c = Math.cos(a), s = Math.sin(a);
         if(p.axis==='Y'){ let t=x*c-z*s; z=x*s+z*c; x=t; }
         else if(p.axis==='X'){ let t=y*c-z*s; z=y*s+z*c; y=t; }
         else { let t=x*c-y*s; y=x*s+y*c; x=t; }
     }
-    let ry = rotationY + (mouseX * 1.3), rx = (mouseY * 0.8);
+    let ry = rotationY + (mouseX * 1.35), rx = (mouseY * 0.85);
     let cry=Math.cos(ry), sry=Math.sin(ry), crx=Math.cos(rx), srx=Math.sin(rx);
     let x1 = x*cry-z*sry, z1 = x*sry+z*cry, y1 = y*crx-z1*srx, z2 = y*srx+z1*crx;
     const f = scale / (z2 + dist);
@@ -107,6 +112,7 @@ function render() {
     const proj = MESH.vertices.map(v => project(v));
     const faces = MESH.faces.map(idx => {
         const pts = idx.map(i => proj[i]);
+        // Centroid-based sorting
         const z = pts.reduce((s,p)=>s+p.z,0)/pts.length;
         const v1 = {x:pts[1].wx-pts[0].wx, y:pts[1].wy-pts[0].wy, z:pts[1].wz-pts[0].wz};
         const v2 = {x:pts[2].wx-pts[0].wx, y:pts[2].wy-pts[0].wy, z:pts[2].wz-pts[0].wz};
@@ -118,12 +124,12 @@ function render() {
     faces.forEach(f => {
         let c;
         if(f.ring) c = f.d > 0.4 ? 'rgb(255,255,0)' : 'rgb(140,140,0)';
-        else c = f.d > 0.7 ? 'rgb(255,255,0)' : f.d > 0.2 ? 'rgb(180,180,0)' : 'rgb(60,60,0)';
+        else c = f.d > 0.7 ? 'rgb(255,255,0)' : f.d > 0.2 ? 'rgb(190,190,0)' : 'rgb(65,65,0)';
         ctx.beginPath(); ctx.fillStyle = c;
         ctx.moveTo(f.pts[0].x, f.pts[0].y);
         for(let i=1;i<f.pts.length;i++) ctx.lineTo(f.pts[i].x, f.pts[i].y);
         ctx.closePath(); ctx.fill();
-        ctx.strokeStyle = '#000'; ctx.lineWidth = 1.2; ctx.stroke();
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 1.3; ctx.stroke();
     });
 
     if (reaction > 0) reaction *= 0.95;
@@ -136,9 +142,9 @@ window.addEventListener('mousemove', (e) => {
 });
 function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
 window.addEventListener('resize', resize);
-resize(); initRefinedSkull(); render();
+resize(); initMasterclassSkull(); render();
 
-const resP = ["skull manifesting.", "topology 100%.", "standing by."];
+const rList = ["topology perfected.", "skull sync 100%.", "standing by, xavier."];
 input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && input.value.trim() !== '') {
         const val = input.value; input.value = ''; reaction = 1.0;
@@ -146,7 +152,7 @@ input.addEventListener('keydown', (e) => {
         output.appendChild(uL);
         setTimeout(() => {
             const bL = document.createElement('div'); bL.className = 'line';
-            bL.innerHTML = `<span class="bot">cypher:</span> ${resP[Math.floor(Math.random()*resP.length)]}`;
+            bL.innerHTML = `<span class="bot">cypher:</span> ${rList[Math.floor(Math.random()*rList.length)]}`;
             output.appendChild(bL); output.scrollTop = output.scrollHeight;
         }, 500);
         output.scrollTop = output.scrollHeight;
