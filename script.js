@@ -1,7 +1,7 @@
 /**
- * CYPHER TERMINAL v12.0.0
- * High-Fidelity Native 3D Mesh Engine
- * Solid Volumetric Face with Anatomical Detail
+ * CYPHER TERMINAL v13.0.0
+ * Stylized Cyber-Skull Engine with Gyroscopic Rings
+ * 3D Solid Toon-Shaded Volumetric Mesh
  */
 
 const canvas = document.getElementById('visualizer-canvas');
@@ -9,78 +9,48 @@ const ctx = canvas.getContext('2d');
 const output = document.getElementById('output');
 const input = document.getElementById('user-input');
 
-let mouseX = 0, mouseY = 0;
-let targetX = 0, targetY = 0;
-let reaction = 0;
-let rotationY = 0;
+let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
+let reaction = 0, rotationY = 0, frame = 0;
 
 const lerp = (a, b, n) => (1 - n) * a + n * b;
 
-// High-Fidelity Human Head Model Data
-const MESH = {
-    vertices: [],
-    faces: []
-};
+const MESH = { vertices: [], faces: [] };
 
-// Procedural high-fidelity head generation
-function generateHighFidelityHead() {
+function initCyberSkull() {
     const v = MESH.vertices;
     const f = MESH.faces;
 
-    // 1. High-Density Base Sphere with Anatomical Deformations
-    const rows = 30, cols = 30;
-    for (let r = 0; r <= rows; r++) {
-        let phi = (r / rows) * Math.PI;
-        for (let c = 0; c <= cols; c++) {
-            let theta = (c / cols) * 2 * Math.PI;
-            
-            let x = Math.sin(phi) * Math.cos(theta);
-            let y = Math.cos(phi);
-            let z = Math.sin(phi) * Math.sin(theta);
+    // 1. STYLIZED GEOMETRIC SKULL (v0-v25)
+    // Cranium
+    v.push({x:0, y:1, z:0}, {x:0.6, y:0.8, z:0.5}, {x:-0.6, y:0.8, z:0.5}, {x:0.5, y:0.8, z:-0.5}, {x:-0.5, y:0.8, z:-0.5});
+    // Brow Ridge & Sockets
+    v.push({x:0.4, y:0.4, z:0.8}, {x:-0.4, y:0.4, z:0.8}, {x:0.1, y:0.35, z:0.85}, {x:-0.1, y:0.35, z:0.85});
+    v.push({x:0.3, y:0.1, z:0.9}, {x:-0.3, y:0.1, z:0.9}, {x:0.1, y:0.15, z:0.95}, {x:-0.1, y:0.15, z:0.95});
+    // Nasal Gap
+    v.push({x:0, y:0.1, z:1.0}, {x:0.1, y:-0.1, z:0.9}, {x:-0.1, y:-0.1, z:0.9});
+    // Cheekbones
+    v.push({x:0.7, y:0, z:0.6}, {x:-0.7, y:0, z:0.6}, {x:0.5, y:-0.2, z:0.8}, {x:-0.5, y:-0.2, z:0.8});
+    // Jaw (Segmented)
+    v.push({x:0.3, y:-0.7, z:0.6}, {x:-0.3, y:-0.7, z:0.6}, {x:0.1, y:-0.8, z:0.75}, {x:-0.1, y:-0.8, z:0.75}, {x:0, y:-0.6, z:0.9});
 
-            // ANATOMICAL SCULPTING
-            let radius = 1.0;
-            
-            // Cranium & Jaw Taper
-            if (y > 0.4) radius *= 1.05; // Brow bulge
-            if (y < -0.3) radius *= (1 - (Math.abs(y + 0.3) * 0.7)); // Jawline taper
+    // Skull Faces
+    f.push([0,1,3],[0,2,4],[0,1,7],[0,2,8],[7,5,9],[8,6,10],[5,15,17],[6,16,18],[13,14,19],[17,19,23],[18,20,24],[19,20,23],[20,21,24],[21,22,23],[21,22,24]);
 
-            // Face-Forward Sculpting (z > 0)
-            if (z > 0) {
-                // Eye Sockets
-                if (Math.abs(x) > 0.15 && Math.abs(x) < 0.45 && y > 0.1 && y < 0.4) {
-                    radius *= 0.92;
-                }
-                // Nose Bridge & Tip
-                if (Math.abs(x) < 0.12 && y > -0.25 && y < 0.25) {
-                    let noseY = (y + 0.25) / 0.5;
-                    radius += 0.25 * Math.sin(noseY * Math.PI) * (1 - Math.abs(x)*5);
-                }
-                // Mouth/Lips
-                if (Math.abs(x) < 0.25 && y > -0.55 && y < -0.35) {
-                    radius += 0.05 * Math.cos((x/0.25) * Math.PI);
-                }
-                // Cheekbones
-                if (Math.abs(x) > 0.4 && y < 0.1 && y > -0.3) {
-                    radius += 0.08 * (1 - Math.abs(y+0.1)*2);
-                }
-            }
-
-            v.push({ x: x * radius * 0.85, y: y * 1.15, z: z * radius * 0.8 });
+    // 2. GYROSCOPIC RINGS (Procedural)
+    const addRing = (radius, vertOffset, axis) => {
+        const segments = 24;
+        const startIdx = v.length;
+        for(let i=0; i<segments; i++){
+            let ang = (i/segments)*Math.PI*2;
+            let rx = Math.cos(ang)*radius, rz = Math.sin(ang)*radius;
+            v.push({x:rx, y:0, z:rz, type:'ring', axis});
         }
-    }
-
-    // Generate Face Indices (Quads to Triangles)
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-            let i1 = r * (cols + 1) + c;
-            let i2 = i1 + 1;
-            let i3 = (r + 1) * (cols + 1) + c;
-            let i4 = i3 + 1;
-            f.push([i1, i2, i4]);
-            f.push([i1, i4, i3]);
+        for(let i=0; i<segments; i++){
+            f.push([startIdx+i, startIdx+((i+1)%segments), 0]); // Connect to center for solid triangle strip
         }
-    }
+    };
+    addRing(1.6, 0, 'Y');
+    addRing(1.9, 0, 'X');
 }
 
 const LIGHT = { x: 0.6, y: 0.6, z: 1.0 };
@@ -88,77 +58,64 @@ const normalize = (v) => {
     const len = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
     return { x: v.x / len, y: v.y / len, z: v.z / len };
 };
-const normalizedLight = normalize(LIGHT);
+const nLight = normalize(LIGHT);
 
 function project(p) {
-    const scale = 260;
-    const distance = 5.0;
-    let ry = rotationY + (mouseX * 1.3);
-    let rx = (mouseY * 0.8);
+    const scale = 220, dist = 6.0;
+    let x = p.x, y = p.y, z = p.z;
     
-    let cosRY = Math.cos(ry), sinRY = Math.sin(ry);
-    let cosRX = Math.cos(rx), sinRX = Math.sin(rx);
+    // Ring Auto-Rotation
+    if(p.type === 'ring'){
+        let ang = frame * 0.04 * (p.axis === 'X' ? 1 : -1.2);
+        let cosA = Math.cos(ang), sinA = Math.sin(ang);
+        if(p.axis === 'Y') { let tx = x*cosA-z*sinA; z = x*sinA+z*cosA; x = tx; }
+        else { let ty = y*cosA-z*sinA; z = y*sinA+z*cosA; y = ty; }
+    }
 
-    let tx = p.x * cosRY - p.z * sinRY;
-    let tz = p.x * sinRY + p.z * cosRY;
-    let ty = p.y * cosRX - tz * sinRX;
-    let finalZ = p.y * sinRX + tz * cosRX;
+    // Global Interaction Rotation
+    let ry = rotationY + (mouseX * 1.4), rx = (mouseY * 0.8);
+    let cRY = Math.cos(ry), sRY = Math.sin(ry), cRX = Math.cos(rx), sRX = Math.sin(rx);
+    let tx = x*cRY-z*sRY, tz = x*sRY+z*cRY, ty = y*cRX-tz*sRX;
+    let fZ = y*sRX+tz*cRX;
 
-    const factor = scale / (finalZ + distance);
-    return {
-        x: tx * factor + canvas.width / 2,
-        y: -ty * factor + canvas.height / 2,
-        z: finalZ,
-        wx: tx, wy: ty, wz: finalZ
-    };
+    const fact = scale / (fZ + dist);
+    return { x: tx*fact + canvas.width/2, y: -ty*fact + canvas.height/2, z: fZ, wx: tx, wy: ty, wz: fZ, type: p.type };
 }
 
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    rotationY += 0.003;
-    mouseX = lerp(mouseX, targetX, 0.05);
-    mouseY = lerp(mouseY, targetY, 0.05);
+    rotationY += 0.005; frame++;
+    mouseX = lerp(mouseX, targetX, 0.05); mouseY = lerp(mouseY, targetY, 0.05);
 
     const projected = MESH.vertices.map(v => project(v));
-
     const faceData = MESH.faces.map(indices => {
         const pts = indices.map(idx => projected[idx]);
-        const avgZ = pts.reduce((sum, p) => sum + p.z, 0) / pts.length;
-        
-        // Face normal calculation
-        const vA = { x: pts[1].wx - pts[0].wx, y: pts[1].wy - pts[0].wy, z: pts[1].wz - pts[0].wz };
-        const vB = { x: pts[2].wx - pts[0].wx, y: pts[2].wy - pts[0].wy, z: pts[2].wz - pts[0].wz };
-        const normal = normalize({
-            x: vA.y * vB.z - vA.z * vB.y,
-            y: vA.z * vB.x - vA.x * vB.z,
-            z: vA.x * vB.y - vA.y * vB.x
-        });
-
-        const dot = normal.x * normalizedLight.x + normal.y * normalizedLight.y + normal.z * normalizedLight.z;
-        return { pts, avgZ, dot };
+        const avgZ = pts.reduce((s, p) => s + p.z, 0) / pts.length;
+        const vA = { x: pts[1].wx-pts[0].wx, y: pts[1].wy-pts[0].wy, z: pts[1].wz-pts[0].wz };
+        const vB = { x: pts[2].wx-pts[0].wx, y: pts[2].wy-pts[0].wy, z: pts[2].wz-pts[0].wz };
+        const norm = normalize({ x: vA.y*vB.z-vA.z*vB.y, y: vA.z*vB.x-vA.x*vB.z, z: vA.x*vB.y-vA.y*vB.x });
+        const dot = norm.x*nLight.x + norm.y*nLight.y + norm.z*nLight.z;
+        return { pts, avgZ, dot, isRing: pts[0].type === 'ring' };
     });
 
-    // Painter's Algorithm: Sort by Z-depth (Back to Front)
     faceData.sort((a, b) => b.avgZ - a.avgZ);
 
-    faceData.forEach(face => {
-        // TOON SHADING (Solid Opaque Bands)
-        let color;
-        if (face.dot > 0.6) color = `rgb(255, 255, 0)`; 
-        else if (face.dot > 0.15) color = `rgb(200, 200, 0)`;
-        else color = `rgb(100, 100, 0)`;
+    faceData.forEach(f => {
+        let col;
+        if(f.isRing) col = f.dot > 0.5 ? `rgb(255,255,0)` : `rgb(150,150,0)`;
+        else col = f.dot > 0.6 ? `rgb(255,255,0)` : f.dot > 0.2 ? `rgb(200,200,0)` : `rgb(80,80,0)`;
+        
+        ctx.beginPath(); ctx.fillStyle = col;
+        ctx.moveTo(f.pts[0].x, f.pts[0].y);
+        for(let i=1; i<f.pts.length; i++) ctx.lineTo(f.pts[i].x, f.pts[i].y);
+        ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.stroke();
+    });
 
-        ctx.beginPath();
-        ctx.fillStyle = color;
-        ctx.moveTo(face.pts[0].x, face.pts[0].y);
-        for(let i = 1; i < face.pts.length; i++) ctx.lineTo(face.pts[i].x, face.pts[i].y);
-        ctx.closePath();
-        ctx.fill();
-
-        // INK OUTLINES
-        ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 1.2;
-        ctx.stroke();
+    // Eye Glow
+    projected.slice(11,13).forEach(p => {
+        ctx.fillStyle = `rgba(255,255,0, ${0.8 + reaction})`;
+        ctx.beginPath(); ctx.arc(p.x, p.y, 4+(reaction*10), 0, Math.PI*2); ctx.fill();
     });
 
     if (reaction > 0) reaction *= 0.94;
@@ -166,51 +123,26 @@ function render() {
 }
 
 window.addEventListener('mousemove', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    targetX = ((e.clientX - rect.left) / canvas.width) - 0.5;
-    targetY = ((e.clientY - rect.top) / canvas.height) - 0.5;
+    const r = canvas.getBoundingClientRect();
+    targetX = ((e.clientX-r.left)/canvas.width)-0.5; targetY = ((e.clientY-r.top)/canvas.height)-0.5;
 });
 
-function resize() {
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-}
-
+function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
 window.addEventListener('resize', resize);
-resize();
-generateHighFidelityHead();
-render();
+resize(); initCyberSkull(); render();
 
-const responses = [
-    "native canvas engine restored. neural mesh optimized.",
-    "biometric structure generated. solid volumetric body active.",
-    "scanning local environment... xavier identity confirmed.",
-    "toon-shaded lighting stable. standing by for instructions.",
-    "the shell is complete. ready for deployment."
-];
-
+const res = ["neural ID: cyber-skull. sequence active.", "gyroscopic rings synchronized.", "welcome, xavier. ready to lock in?"];
 input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && input.value.trim() !== '') {
-        const val = input.value;
-        input.value = '';
-        reaction = 0.5;
-
-        const userLine = document.createElement('div');
-        userLine.className = 'line';
-        userLine.innerHTML = `<span class="user-tag">xavier:</span> <span class="user-msg">${val}</span>`;
-        output.appendChild(userLine);
-        
+        const val = input.value; input.value = ''; reaction = 0.8;
+        const uL = document.createElement('div'); uL.className = 'line'; uL.innerHTML = `<span class="user-tag">xavier:</span> <span class="user-msg">${val}</span>`;
+        output.appendChild(uL);
         setTimeout(() => {
-            const botLine = document.createElement('div');
-            botLine.className = 'line';
-            const res = responses[Math.floor(Math.random() * responses.length)];
-            botLine.innerHTML = `<span class="bot">cypher:</span> ${res}`;
-            output.appendChild(botLine);
-            output.scrollTop = output.scrollHeight;
+            const bL = document.createElement('div'); bL.className = 'line';
+            bL.innerHTML = `<span class="bot">cypher:</span> ${res[Math.floor(Math.random()*res.length)]}`;
+            output.appendChild(bL); output.scrollTop = output.scrollHeight;
         }, 500);
-        
         output.scrollTop = output.scrollHeight;
     }
 });
-
 document.getElementById('terminal').addEventListener('click', () => input.focus());
