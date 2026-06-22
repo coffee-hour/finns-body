@@ -1,13 +1,13 @@
-# Cypher Terminal v6.0.0
+# Cypher Terminal v7.0.0
 
-Organic Volumetric 3D Face Projection.
+High-Fidelity 3D Mesh Engine with Wireframe Topology.
 
 ## Technical Specifications
-- **Visualizer:** Organic 3D projection engine with 1500+ points of high-density biometric data.
-- **Biometric Detail:** High-fidelity rendering of curved eyelids, nose bridge with nostrils, defined lips, anatomical cheekbones, ears, and neck support.
-- **Volumetric Rendering:** Implemented depth-sorting (Painter's Algorithm) to create a solid 3D volumetric effect. Front-facing geometry is rendered brighter and larger, correctly overlaying background points.
-- **Interaction:** Smooth, lerp-based cursor gaze-tracking and reactive transmission pulsing.
-- **Voice Protocol:** Professional hacker persona. Zero slang.
+- **3D Engine:** Implementation of a lightweight vanilla JS 3D projection system rendering a structured human head mesh.
+- **Topology:** Wireframe mesh with connected polygonal faces (triangles/quads), providing a professional CAD/3D modeling aesthetic.
+- **Volumetric Rendering:** Depth-sorting (Painter's Algorithm) with distance-based alpha mapping ensures front-facing edges correctly overlay the back of the head.
+- **Interaction:** Smooth, gaze-tracking rotation that follows the cursor and reactive transmission pulsing.
+- **Voice Protocol:** 100% tech-focused, professional persona. Zero slang.
 
 ## Deployment
-Optimized for high-performance static hosting. Live at `finn.xavier.poke.site`.
+Compatible with all static hosting providers. Optimized for `finn.xavier.poke.site`.

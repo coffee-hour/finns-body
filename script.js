@@ -1,7 +1,7 @@
 /**
- * CYPHER TERMINAL v6.0.0
- * Organic Volumetric 3D Face Projection
- * High-Density Point Cloud & Depth Sorting
+ * CYPHER TERMINAL v7.0.0
+ * High-Fidelity 3D Mesh Engine (Vanilla JS)
+ * Wireframe Topology with Depth-Sorting
  */
 
 const canvas = document.getElementById('visualizer-canvas');
@@ -13,132 +13,75 @@ let mouseX = 0, mouseY = 0;
 let targetX = 0, targetY = 0;
 let reaction = 0;
 let rotationY = 0;
-const points = [];
 
-// Helper: Linear Interpolation for fluid motion
 const lerp = (a, b, n) => (1 - n) * a + n * b;
 
-function initHighFidelityFace() {
-    // 1. Base Cranium (High Density)
-    for(let i=0; i<800; i++) {
-        let u = Math.random();
-        let v = Math.random();
-        let theta = 2 * Math.PI * u;
-        let phi = Math.acos(2 * v - 1);
-        let r = 0.85;
-        let x = Math.sin(phi) * Math.cos(theta) * r;
-        let y = Math.cos(phi) * 1.1;
-        let z = Math.sin(phi) * Math.sin(theta) * r * 0.9;
-        
-        // Taper for jaw and chin
-        if (y < -0.2) {
-            let taper = 1 - (Math.abs(y + 0.2) * 0.6);
-            x *= taper;
-            z *= taper;
-        }
-        points.push({x, y, z, type: 'skin'});
-    }
-
-    // 2. Eyes & Detailed Eyelids
-    for(let side of [-1, 1]) {
-        for(let i=0; i<100; i++) {
-            let t = (i / 100) * Math.PI;
-            // Eyelid curves
-            let ex = (0.28 * side) + Math.cos(t) * 0.12;
-            let ey = 0.22 + Math.sin(t) * 0.05 * (i % 2 === 0 ? 1 : -0.5);
-            points.push({x: ex, y: ey, z: 0.72, type: 'feature'});
-            // Eyeball surface
-            if (i < 40) {
-                points.push({
-                    x: (0.28 * side) + (Math.random()-0.5)*0.1, 
-                    y: 0.22 + (Math.random()-0.5)*0.08, 
-                    z: 0.75, 
-                    type: 'eye'
-                });
-            }
-        }
-    }
-
-    // 3. Nose Structure (Bridge + Nostrils)
-    for(let i=0; i<150; i++) {
-        let ty = (i / 150) * 0.5 - 0.25; // y from 0.25 down to -0.25
-        let bridgeWidth = 0.03 + (ty < -0.1 ? Math.abs(ty+0.1)*0.4 : 0);
-        let x = (Math.random()-0.5) * bridgeWidth;
-        let z = 0.7 + (ty < 0 ? Math.abs(ty)*0.8 : 0);
-        points.push({x, y: -ty, z, type: 'feature'});
-        // Nostril flares
-        if (i > 120) {
-            points.push({x: bridgeWidth*2, y: -ty, z: z-0.05, type: 'feature'});
-            points.push({x: -bridgeWidth*2, y: -ty, z: z-0.05, type: 'feature'});
-        }
-    }
-
-    // 4. Defined Lips
-    for(let i=0; i<120; i++) {
-        let t = (i / 120) * Math.PI * 2;
-        let lx = Math.cos(t) * 0.18;
-        let ly = -0.42 + Math.sin(t) * 0.06 * (Math.sin(t) > 0 ? 1 : 0.6);
-        points.push({x: lx, y: ly, z: 0.75 + Math.abs(lx)*0.2, type: 'feature'});
-    }
-
-    // 5. Cheekbones & Jawline
-    for(let i=0; i<200; i++) {
-        let t = (i / 200) * 2 - 1; // -1 to 1
-        let x = t * 0.8;
-        let y = -0.1 - (Math.abs(t) * 0.4);
-        points.push({x, y, z: 0.6 + (Math.abs(t)*0.3), type: 'skin'}); // Cheekbones
-        
-        let jx = t * 0.5;
-        let jy = -0.9 + (Math.abs(t)*0.3);
-        points.push({x: jx, y: jy, z: 0.5 - (Math.abs(t)*0.4), type: 'feature'}); // Jaw
-    }
-
-    // 6. Ears
-    for(let side of [-1, 1]) {
-        for(let i=0; i<60; i++) {
-            let u = Math.random() * Math.PI;
-            points.push({
-                x: (0.85 * side) + Math.sin(u) * 0.15 * side,
-                y: 0.1 + Math.cos(u) * 0.25,
-                z: -0.1,
-                type: 'skin'
-            });
-        }
-    }
-
-    // 7. Neck Support
-    for(let i=0; i<150; i++) {
-        let ty = -1.0 - Math.random() * 0.5;
-        let rad = 0.4;
-        let ang = Math.random() * Math.PI * 2;
-        points.push({
-            x: Math.cos(ang) * rad,
-            y: ty,
-            z: Math.sin(ang) * rad * 0.8,
-            type: 'skin'
-        });
-    }
-}
+// Low-poly human head mesh data (Vertices & Faces)
+const MESH = {
+    vertices: [
+        // Cranium
+        {x: 0, y: 1.1, z: 0}, {x: 0.4, y: 1.0, z: 0.4}, {x: -0.4, y: 1.0, z: 0.4},
+        {x: 0.4, y: 1.0, z: -0.4}, {x: -0.4, y: 1.0, z: -0.4}, {x: 0.7, y: 0.6, z: 0.5},
+        {x: -0.7, y: 0.6, z: 0.5}, {x: 0.7, y: 0.6, z: -0.5}, {x: -0.7, y: 0.6, z: -0.5},
+        // Forehead
+        {x: 0.3, y: 0.7, z: 0.8}, {x: -0.3, y: 0.7, z: 0.8}, {x: 0, y: 0.7, z: 0.9},
+        // Eyes/Brows
+        {x: 0.4, y: 0.3, z: 0.85}, {x: -0.4, y: 0.3, z: 0.85}, {x: 0.15, y: 0.25, z: 0.9},
+        {x: -0.15, y: 0.25, z: 0.9}, {x: 0.3, y: 0.15, z: 0.95}, {x: -0.3, y: 0.15, z: 0.95},
+        // Nose
+        {x: 0, y: 0.2, z: 1.0}, {x: 0, y: -0.1, z: 1.15}, {x: 0.1, y: -0.2, z: 1.05},
+        {x: -0.1, y: -0.2, z: 1.05},
+        // Cheeks
+        {x: 0.6, y: -0.1, z: 0.7}, {x: -0.6, y: -0.1, z: 0.7}, {x: 0.4, y: -0.3, z: 0.85},
+        {x: -0.4, y: -0.3, z: 0.85},
+        // Mouth
+        {x: 0.2, y: -0.45, z: 0.9}, {x: -0.2, y: -0.45, z: 0.9}, {x: 0, y: -0.4, z: 1.0},
+        {x: 0, y: -0.55, z: 0.95},
+        // Jaw/Chin
+        {x: 0.3, y: -0.8, z: 0.6}, {x: -0.3, y: -0.8, z: 0.6}, {x: 0, y: -0.9, z: 0.8},
+        // Ears/Sides
+        {x: 0.85, y: 0.1, z: 0}, {x: -0.85, y: 0.1, z: 0}, {x: 0.85, y: -0.2, z: 0},
+        {x: -0.85, y: -0.2, z: 0},
+        // Neck
+        {x: 0.3, y: -1.2, z: 0.2}, {x: -0.3, y: -1.2, z: 0.2}, {x: 0, y: -1.2, z: 0.4}
+    ],
+    faces: [
+        // Forehead/Cranium connections
+        [0, 1, 3], [0, 2, 4], [1, 9, 11], [2, 10, 11], [1, 5, 9], [2, 6, 10],
+        // Eyes/Bridge
+        [11, 14, 18], [11, 15, 18], [9, 12, 14], [10, 13, 15], [14, 16, 18], [15, 17, 18],
+        // Nose
+        [18, 19, 20], [18, 19, 21], [19, 20, 28], [19, 21, 28],
+        // Cheeks/Mouth
+        [12, 22, 24], [13, 23, 25], [24, 26, 28], [25, 27, 28], [26, 28, 29], [27, 28, 29],
+        // Jaw/Chin
+        [24, 30, 32], [25, 31, 32], [26, 30, 29], [27, 31, 29], [30, 32, 29], [31, 32, 29],
+        // Sides/Back
+        [5, 22, 33], [6, 23, 34], [33, 35, 30], [34, 36, 31],
+        // Neck
+        [30, 37, 39], [31, 38, 39]
+    ]
+};
 
 function project(p) {
-    const scale = 260;
-    const distance = 4.5;
+    const scale = 250;
+    const distance = 5;
     
     let x = p.x;
     let y = p.y;
     let z = p.z;
 
-    // Fluid Gaze/Rotation Lerp
-    let ry = rotationY + (mouseX * 0.8);
-    let cosRY = Math.cos(ry);
-    let sinRY = Math.sin(ry);
-    let rx = (mouseY * 0.5);
-    let cosRX = Math.cos(rx);
-    let sinRX = Math.sin(rx);
-
-    // Transforms
+    // Interaction Rotations
+    let ry = rotationY + (mouseX * 1.0);
+    let rx = (mouseY * 0.6);
+    
+    // Y-Axis
+    let cosRY = Math.cos(ry), sinRY = Math.sin(ry);
     let tx = x * cosRY - z * sinRY;
     let tz = x * sinRY + z * cosRY;
+    
+    // X-Axis
+    let cosRX = Math.cos(rx), sinRX = Math.sin(rx);
     let ty = y * cosRX - tz * sinRX;
     tz = y * sinRX + tz * cosRX;
 
@@ -146,40 +89,58 @@ function project(p) {
     return {
         x: tx * factor + canvas.width / 2,
         y: -ty * factor + canvas.height / 2,
-        z: tz, // For depth sorting
-        type: p.type
+        z: tz
     };
 }
 
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    rotationY += 0.003;
-    
-    // Smooth input tracking
+    rotationY += 0.005;
     mouseX = lerp(mouseX, targetX, 0.05);
     mouseY = lerp(mouseY, targetY, 0.05);
 
-    // Depth Sorting (Painter's Algorithm)
-    // Points with higher Z (closer to screen) are rendered last
-    const projected = points.map(p => project(p));
-    projected.sort((a, b) => b.z - a.z);
+    // 1. Project all vertices
+    const projected = MESH.vertices.map(v => project(v));
 
-    projected.forEach((p) => {
-        const flicker = Math.random() > 0.98 ? 0.4 : 1;
+    // 2. Prepare Faces for depth sorting
+    const faceData = MESH.faces.map(faceIndices => {
+        const points = faceIndices.map(idx => projected[idx]);
+        // Simple depth average for Painter's Algorithm
+        const avgZ = points.reduce((sum, p) => sum + p.z, 0) / points.length;
+        return { points, avgZ };
+    });
+
+    // 3. Sort by Depth (Back to Front)
+    faceData.sort((a, b) => b.avgZ - a.avgZ);
+
+    // 4. Render Faces
+    faceData.forEach(face => {
+        const flicker = Math.random() > 0.98 ? 0.5 : 1;
+        // Distance-based alpha
+        let depthAlpha = (face.avgZ + 2) / 4; 
+        let alpha = Math.max(0.1, depthAlpha * 0.6) * flicker + (reaction * 0.4);
+
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(255, 255, 0, ${alpha})`;
+        ctx.lineWidth = 0.8;
         
-        // Depth-based lighting/sizing
-        // tz ranges roughly from -1 to 1.5. map to alpha/size
-        let depthFactor = (p.z + 2) / 4; // 0 to 1
-        let size = (depthFactor * 2.2) + (reaction * 3);
-        let alpha = Math.max(0.05, depthFactor * 0.8) * flicker + (reaction * 0.5);
-
-        if(p.type === 'feature') {
-            size += 0.8;
-            alpha = Math.min(1, alpha + 0.2);
+        // Move to first point
+        ctx.moveTo(face.points[0].x, face.points[0].y);
+        for(let i = 1; i < face.points.length; i++) {
+            ctx.lineTo(face.points[i].x, face.points[i].y);
         }
+        ctx.closePath();
+        
+        // Optional: subtle fill to enhance "solid" feel
+        ctx.fillStyle = `rgba(255, 255, 0, ${alpha * 0.05})`;
+        ctx.fill();
+        ctx.stroke();
 
-        ctx.fillStyle = `rgba(255, 255, 0, ${alpha})`;
-        ctx.fillRect(p.x, p.y, size, size);
+        // Render vertices as glowing nodes
+        face.points.forEach(p => {
+            ctx.fillStyle = `rgba(255, 255, 0, ${alpha * 1.5})`;
+            ctx.fillRect(p.x - 1, p.y - 1, 2, 2);
+        });
     });
 
     if (reaction > 0) reaction *= 0.95;
@@ -199,23 +160,20 @@ function resize() {
 
 window.addEventListener('resize', resize);
 resize();
-initHighFidelityFace();
 render();
 
-// Terminal logic remains clean and professional
+// Terminal Chat logic
 const responses = [
-    "encryption handshake verified. uplink is secure.",
-    "volumetric data stream synchronized. biometric fidelity at maximum.",
-    "kernel optimization complete. resource allocation is efficient.",
-    "standing by for system instructions. neural bridge is stable.",
-    "local environment scan complete. zero intrusions detected.",
-    "identity verified: xavier. full terminal access granted.",
-    "processing request through secondary neural nodes...",
-    "holographic gain adjusted. biometric resolution optimized."
+    "mesh integrity verified. topology is optimized.",
+    "holographic projection stable. scanning for input sequences.",
+    "neural link established. awaiting your next command, xavier.",
+    "system diagnostics: 100% nominal. ready for deployment.",
+    "compiling request through biometric nodes... sequence valid.",
+    "the shell is active. ready to build the future."
 ];
 
 input.addEventListener('keydown', (e) => {
-    reaction = 0.3;
+    reaction = 0.2;
     if (e.key === 'Enter' && input.value.trim() !== '') {
         const val = input.value;
         input.value = '';
@@ -231,7 +189,7 @@ input.addEventListener('keydown', (e) => {
             botLine.innerHTML = `<span class="bot">cypher:</span> ${res}`;
             output.appendChild(botLine);
             output.scrollTop = output.scrollHeight;
-            reaction = 1.2;
+            reaction = 1.0;
         }, 500);
         output.scrollTop = output.scrollHeight;
     }
