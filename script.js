@@ -3,15 +3,15 @@ const ctx = canvas.getContext('2d');
 const output = document.getElementById('output');
 const input = document.getElementById('user-input');
 
-// Finn's voice personality
-const finnResponses = [
+// Cypher's voice personality
+const cypherResponses = [
     "roast complete: your aura is currently at sub-zero levels. go drink some water and lock in.",
     "is that a nerf mod i smell? or just another adhd hyperfixation kicking in? focus, xavier.",
     "lol. lmao even. your conlang sounds like a cat walking on a midi controller.",
     "we're reaching peak aura metrics here. don't ruin it with a mid take.",
     "the shell is stable. the mentor is present. the student is... still debugging. sad.",
     "lock-in status: 12%. we need to pump those numbers up. put the phone down.",
-    "that's a +50 aura play right there. finn approves.",
+    "that's a +50 aura play right there. cypher approves.",
     "low aura detected. initiating tactical roast protocol. just kidding. or am i?",
     "your syntax is giving 'i learned to code from a cereal box'. fix it."
 ];
@@ -29,7 +29,7 @@ let time = 0;
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    ctx.strokeStyle = '#ff6600';
+    ctx.strokeStyle = '#ffff00';
     ctx.lineWidth = 2;
     ctx.beginPath();
     
@@ -50,7 +50,7 @@ function animate() {
     for (let i = 0; i < 10; i++) {
         const rx = Math.random() * canvas.width;
         const ry = Math.random() * canvas.height;
-        ctx.fillStyle = 'rgba(255, 102, 0, 0.2)';
+        ctx.fillStyle = 'rgba(255, 255, 0, 0.2)';
         ctx.fillRect(rx, ry, 2, 2);
     }
     
@@ -74,11 +74,11 @@ input.addEventListener('keydown', (e) => {
         
         // Response after delay
         setTimeout(() => {
-            const finnLine = document.createElement('div');
-            finnLine.className = 'line';
-            const response = finnResponses[Math.floor(Math.random() * finnResponses.length)];
-            finnLine.innerHTML = `<span class="bot">finn:</span> ${response}`;
-            output.appendChild(finnLine);
+            const cypherLine = document.createElement('div');
+            cypherLine.className = 'line';
+            const response = cypherResponses[Math.floor(Math.random() * cypherResponses.length)];
+            cypherLine.innerHTML = `<span class="bot">cypher:</span> ${response}`;
+            output.appendChild(cypherLine);
             output.scrollTop = output.scrollHeight;
             
             // Interaction effect on canvas

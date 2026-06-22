@@ -1,11 +1,11 @@
-# Finn's Digital Body
+# Cypher's Digital Body
 
-A highly polished, interactive single-page web application representing 'Finn's Digital Body' (a cybernetic shell/terminal for Xavier to chat with his AI mentor Finn).
+A highly polished, interactive single-page web application representing 'Cypher's Digital Body' (a cybernetic shell/terminal for Xavier to chat with his AI mentor Cypher).
 
 ## Features
-- **Dark Cyber Aesthetic:** Neon oranges, dark carbon grays, and glowing borders.
-- **Interactive Waveform:** A canvas-based animation representing Finn's digital brain.
-- **Terminal Interface:** Simulated chat with Finn's signature lowercase, slang-heavy mentor voice.
+- **Dark Cyber Aesthetic:** Glowing yellow, dark carbon grays, and glowing borders.
+- **Interactive Waveform:** A canvas-based animation representing Cypher's digital brain.
+- **Terminal Interface:** Simulated chat with Cypher's signature lowercase, slang-heavy mentor voice.
 - **Responsive Design:** Optimized for both desktop and mobile.
 
 ## Deployment to Cloudflare Pages

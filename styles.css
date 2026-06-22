@@ -1,8 +1,8 @@
 :root {
     --bg-dark: #0a0a0a;
     --carbon: #1a1a1a;
-    --neon-orange: #ff6600;
-    --neon-orange-glow: rgba(255, 102, 0, 0.5);
+    --cyber-yellow: #ffff00;
+    --cyber-yellow-glow: rgba(255, 255, 0, 0.5);
     --text-dim: #888;
     --font-mono: 'Courier Prime', 'Courier New', monospace;
 }
@@ -15,7 +15,7 @@
 
 body {
     background-color: var(--bg-dark);
-    color: var(--neon-orange);
+    color: var(--cyber-yellow);
     font-family: var(--font-mono);
     height: 100vh;
     overflow: hidden;
@@ -29,8 +29,8 @@ body {
     max-width: 900px;
     height: 90vh;
     background: var(--carbon);
-    border: 1px solid var(--neon-orange);
-    box-shadow: 0 0 20px var(--neon-orange-glow);
+    border: 1px solid var(--cyber-yellow);
+    box-shadow: 0 0 20px var(--cyber-yellow-glow);
     display: flex;
     flex-direction: column;
     position: relative;
@@ -38,7 +38,7 @@ body {
 
 header {
     height: 30%;
-    border-bottom: 1px solid var(--neon-orange);
+    border-bottom: 1px solid var(--cyber-yellow);
     position: relative;
     overflow: hidden;
     background: #000;
@@ -85,7 +85,7 @@ header h1 {
     flex-direction: column;
     gap: 10px;
     scrollbar-width: thin;
-    scrollbar-color: var(--neon-orange) var(--carbon);
+    scrollbar-color: var(--cyber-yellow) var(--carbon);
 }
 
 #output::-webkit-scrollbar {
@@ -93,7 +93,7 @@ header h1 {
 }
 
 #output::-webkit-scrollbar-thumb {
-    background-color: var(--neon-orange);
+    background-color: var(--cyber-yellow);
 }
 
 .line {
