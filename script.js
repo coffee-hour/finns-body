@@ -12,7 +12,6 @@ let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
 let reaction = 0, rotationY = 0, frame = 0;
 let lastMessageId = 0;
 
-const POKE_INGEST_URL = "https://poke.com/api/v1/inbound/ingest/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4ZjBiMzc5ZC03MjU5LTQxODUtOGM4MC04MzcwNzY4MDdjNDkiLCJqdGkiOiI4MGE5ZWI3ZC01NTUzLTQ5ZDItYjU4OS02ZGVlZDYxZjI4NDkiLCJpYXQiOjE3ODIxNTgyNDIsImV4cCI6MjA5NzUxODI0Mn0.ejwYRs35Zjp1XvWsHufi6-TqvrjIud1lZrHDe_5KSpg";
 const WORKER_URL = "https://cypherlink.xaviersgames.workers.dev/api/messages";
 
 const lerp = (a, b, n) => (1 - n) * a + n * b;
@@ -113,9 +112,9 @@ function appendMessage(sender, text) {
     if (sender === 'cypher') reaction = 1.0;
 }
 
-async function sendToPoke(message) {
+async function sendToWorker(message) {
     try {
-        await fetch(POKE_INGEST_URL, {
+        await fetch(WORKER_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ source: "cypher_terminal", sender: "xavier", message, timestamp: new Date().toISOString() })
@@ -141,7 +140,7 @@ input.addEventListener('keydown', async (e) => {
         const val = input.value;
         input.value = '';
         appendMessage('xavier', val);
-        await sendToPoke(val);
+        await sendToWorker(val);
     }
 });
 
