@@ -1,7 +1,7 @@
 /**
- * CYPHER TERMINAL v7.0.0
- * High-Fidelity 3D Mesh Engine (Vanilla JS)
- * Wireframe Topology with Depth-Sorting
+ * CYPHER TERMINAL v8.0.0
+ * High-Resolution 3D Mesh Engine with Diffuse Shading
+ * Detailed Humanoid Topology and Face Normals
  */
 
 const canvas = document.getElementById('visualizer-canvas');
@@ -16,134 +16,148 @@ let rotationY = 0;
 
 const lerp = (a, b, n) => (1 - n) * a + n * b;
 
-// Low-poly human head mesh data (Vertices & Faces)
+// High-Resolution Mesh Data
+// Expanded vertex set and subdivided face indices
 const MESH = {
     vertices: [
-        // Cranium
-        {x: 0, y: 1.1, z: 0}, {x: 0.4, y: 1.0, z: 0.4}, {x: -0.4, y: 1.0, z: 0.4},
-        {x: 0.4, y: 1.0, z: -0.4}, {x: -0.4, y: 1.0, z: -0.4}, {x: 0.7, y: 0.6, z: 0.5},
-        {x: -0.7, y: 0.6, z: 0.5}, {x: 0.7, y: 0.6, z: -0.5}, {x: -0.7, y: 0.6, z: -0.5},
-        // Forehead
-        {x: 0.3, y: 0.7, z: 0.8}, {x: -0.3, y: 0.7, z: 0.8}, {x: 0, y: 0.7, z: 0.9},
-        // Eyes/Brows
-        {x: 0.4, y: 0.3, z: 0.85}, {x: -0.4, y: 0.3, z: 0.85}, {x: 0.15, y: 0.25, z: 0.9},
-        {x: -0.15, y: 0.25, z: 0.9}, {x: 0.3, y: 0.15, z: 0.95}, {x: -0.3, y: 0.15, z: 0.95},
-        // Nose
-        {x: 0, y: 0.2, z: 1.0}, {x: 0, y: -0.1, z: 1.15}, {x: 0.1, y: -0.2, z: 1.05},
-        {x: -0.1, y: -0.2, z: 1.05},
-        // Cheeks
-        {x: 0.6, y: -0.1, z: 0.7}, {x: -0.6, y: -0.1, z: 0.7}, {x: 0.4, y: -0.3, z: 0.85},
-        {x: -0.4, y: -0.3, z: 0.85},
-        // Mouth
-        {x: 0.2, y: -0.45, z: 0.9}, {x: -0.2, y: -0.45, z: 0.9}, {x: 0, y: -0.4, z: 1.0},
-        {x: 0, y: -0.55, z: 0.95},
-        // Jaw/Chin
-        {x: 0.3, y: -0.8, z: 0.6}, {x: -0.3, y: -0.8, z: 0.6}, {x: 0, y: -0.9, z: 0.8},
-        // Ears/Sides
-        {x: 0.85, y: 0.1, z: 0}, {x: -0.85, y: 0.1, z: 0}, {x: 0.85, y: -0.2, z: 0},
-        {x: -0.85, y: -0.2, z: 0},
-        // Neck
-        {x: 0.3, y: -1.2, z: 0.2}, {x: -0.3, y: -1.2, z: 0.2}, {x: 0, y: -1.2, z: 0.4}
+        // Cranium & Forehead (Subdivided)
+        {x: 0, y: 1.15, z: 0}, {x: 0.3, y: 1.05, z: 0.5}, {x: -0.3, y: 1.05, z: 0.5},
+        {x: 0.5, y: 0.9, z: 0.6}, {x: -0.5, y: 0.9, z: 0.6}, {x: 0.7, y: 0.6, z: 0.4},
+        {x: -0.7, y: 0.6, z: 0.4}, {x: 0.3, y: 0.8, z: 0.8}, {x: -0.3, y: 0.8, z: 0.8},
+        {x: 0, y: 0.85, z: 0.9},
+        // Brow & Eye Sockets
+        {x: 0.45, y: 0.4, z: 0.8}, {x: -0.45, y: 0.4, z: 0.8}, {x: 0.15, y: 0.35, z: 0.9},
+        {x: -0.15, y: 0.35, z: 0.9}, {x: 0.4, y: 0.2, z: 0.85}, {x: -0.4, y: 0.2, z: 0.85},
+        {x: 0.2, y: 0.15, z: 0.9}, {x: -0.2, y: 0.15, z: 0.9},
+        // Eyes (Pupils/Irises Detail)
+        {x: 0.28, y: 0.25, z: 0.88}, {x: -0.28, y: 0.25, z: 0.88},
+        // Nose Structure (Refined)
+        {x: 0, y: 0.35, z: 0.95}, {x: 0, y: 0, z: 1.1}, {x: 0.12, y: -0.1, z: 1.05},
+        {x: -0.12, y: -0.1, z: 1.05}, {x: 0, y: -0.15, z: 1.15},
+        // Lips & Mouth (High Detail)
+        {x: 0.25, y: -0.35, z: 0.9}, {x: -0.25, y: -0.35, z: 0.9}, {x: 0, y: -0.3, z: 1.02},
+        {x: 0.15, y: -0.45, z: 1.0}, {x: -0.15, y: -0.45, z: 1.0}, {x: 0, y: -0.5, z: 1.0},
+        {x: 0.1, y: -0.38, z: 1.05}, {x: -0.1, y: -0.38, z: 1.05},
+        // Cheekbones & Jaw (Contoured)
+        {x: 0.65, y: 0, z: 0.75}, {x: -0.65, y: 0, z: 0.75}, {x: 0.5, y: -0.3, z: 0.8},
+        {x: -0.5, y: -0.3, z: 0.8}, {x: 0.35, y: -0.75, z: 0.7}, {x: -0.35, y: -0.75, z: 0.7},
+        {x: 0, y: -0.9, z: 0.85},
+        // Ears
+        {x: 0.85, y: 0.2, z: 0.1}, {x: -0.85, y: 0.2, z: 0.1}, {x: 0.9, y: -0.1, z: 0.1},
+        {x: -0.9, y: -0.1, z: 0.1}, {x: 0.85, y: -0.3, z: 0.2}, {x: -0.85, y: -0.3, z: 0.2},
+        // Neck & Shoulders
+        {x: 0.4, y: -1.1, z: 0.3}, {x: -0.4, y: -1.1, z: 0.3}, {x: 0, y: -1.1, z: 0.5},
+        {x: 0.8, y: -1.3, z: 0.1}, {x: -0.8, y: -1.3, z: 0.1}
     ],
     faces: [
-        // Forehead/Cranium connections
-        [0, 1, 3], [0, 2, 4], [1, 9, 11], [2, 10, 11], [1, 5, 9], [2, 6, 10],
-        // Eyes/Bridge
-        [11, 14, 18], [11, 15, 18], [9, 12, 14], [10, 13, 15], [14, 16, 18], [15, 17, 18],
-        // Nose
-        [18, 19, 20], [18, 19, 21], [19, 20, 28], [19, 21, 28],
-        // Cheeks/Mouth
-        [12, 22, 24], [13, 23, 25], [24, 26, 28], [25, 27, 28], [26, 28, 29], [27, 28, 29],
-        // Jaw/Chin
-        [24, 30, 32], [25, 31, 32], [26, 30, 29], [27, 31, 29], [30, 32, 29], [31, 32, 29],
-        // Sides/Back
-        [5, 22, 33], [6, 23, 34], [33, 35, 30], [34, 36, 31],
-        // Neck
-        [30, 37, 39], [31, 38, 39]
+        // Forehead Sub-mesh
+        [0, 1, 3], [0, 2, 4], [1, 3, 7], [2, 4, 8], [7, 8, 9], [9, 12, 20], [9, 13, 20],
+        // Brow & Eyes
+        [7, 10, 12], [8, 11, 13], [12, 14, 16], [13, 15, 17], [12, 18, 16], [13, 19, 17],
+        // Nose Bridge & Nostrils
+        [20, 21, 22], [20, 21, 23], [21, 22, 24], [21, 23, 24], [22, 24, 28], [23, 24, 29],
+        // Mouth Detail
+        [27, 31, 32], [27, 25, 31], [27, 26, 32], [31, 32, 30], [25, 28, 30], [26, 29, 30],
+        // Cheek & Jawline
+        [14, 33, 35], [15, 34, 36], [35, 37, 39], [36, 38, 39], [35, 25, 28], [36, 26, 29],
+        // Ears
+        [5, 40, 42], [6, 41, 43], [40, 42, 44], [41, 43, 45],
+        // Shoulders
+        [37, 46, 49], [38, 47, 50], [46, 47, 48]
     ]
 };
 
+// Light Vector (Top-Right-Front)
+const LIGHT = { x: 0.5, y: 0.5, z: 1 };
+const normalize = (v) => {
+    const len = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+    return { x: v.x / len, y: v.y / len, z: v.z / len };
+};
+const normalizedLight = normalize(LIGHT);
+
 function project(p) {
-    const scale = 250;
-    const distance = 5;
+    const scale = 270;
+    const distance = 5.5;
+    let ry = rotationY + (mouseX * 1.2);
+    let rx = (mouseY * 0.7);
     
-    let x = p.x;
-    let y = p.y;
-    let z = p.z;
-
-    // Interaction Rotations
-    let ry = rotationY + (mouseX * 1.0);
-    let rx = (mouseY * 0.6);
-    
-    // Y-Axis
+    // Rotation Matrix
     let cosRY = Math.cos(ry), sinRY = Math.sin(ry);
-    let tx = x * cosRY - z * sinRY;
-    let tz = x * sinRY + z * cosRY;
-    
-    // X-Axis
     let cosRX = Math.cos(rx), sinRX = Math.sin(rx);
-    let ty = y * cosRX - tz * sinRX;
-    tz = y * sinRX + tz * cosRX;
 
-    const factor = scale / (tz + distance);
+    let tx = p.x * cosRY - p.z * sinRY;
+    let tz = p.x * sinRY + p.z * cosRY;
+    let ty = p.y * cosRX - tz * sinRX;
+    let finalZ = p.y * sinRX + tz * cosRX;
+
+    const factor = scale / (finalZ + distance);
     return {
         x: tx * factor + canvas.width / 2,
         y: -ty * factor + canvas.height / 2,
-        z: tz
+        z: finalZ,
+        // World coordinates for normal calculation
+        wx: tx, wy: ty, wz: finalZ
     };
 }
 
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    rotationY += 0.005;
+    rotationY += 0.004;
     mouseX = lerp(mouseX, targetX, 0.05);
     mouseY = lerp(mouseY, targetY, 0.05);
 
-    // 1. Project all vertices
     const projected = MESH.vertices.map(v => project(v));
 
-    // 2. Prepare Faces for depth sorting
-    const faceData = MESH.faces.map(faceIndices => {
-        const points = faceIndices.map(idx => projected[idx]);
-        // Simple depth average for Painter's Algorithm
-        const avgZ = points.reduce((sum, p) => sum + p.z, 0) / points.length;
-        return { points, avgZ };
+    const faceData = MESH.faces.map(indices => {
+        const pts = indices.map(idx => projected[idx]);
+        const avgZ = pts.reduce((sum, p) => sum + p.z, 0) / pts.length;
+        
+        // Calculate Face Normal for Shading
+        // Vector A = p1 - p0, Vector B = p2 - p0
+        const vA = { x: pts[1].wx - pts[0].wx, y: pts[1].wy - pts[0].wy, z: pts[1].wz - pts[0].wz };
+        const vB = { x: pts[2].wx - pts[0].wx, y: pts[2].wy - pts[0].wy, z: pts[2].wz - pts[0].wz };
+        const normal = normalize({
+            x: vA.y * vB.z - vA.z * vB.y,
+            y: vA.z * vB.x - vA.x * vB.z,
+            z: vA.x * vB.y - vA.y * vB.x
+        });
+
+        // Dot Product for Diffuse Shading
+        const dot = Math.max(0, normal.x * normalizedLight.x + normal.y * normalizedLight.y + normal.z * normalizedLight.z);
+        
+        return { pts, avgZ, dot };
     });
 
-    // 3. Sort by Depth (Back to Front)
+    // Painter's Algorithm
     faceData.sort((a, b) => b.avgZ - a.avgZ);
 
-    // 4. Render Faces
     faceData.forEach(face => {
-        const flicker = Math.random() > 0.98 ? 0.5 : 1;
-        // Distance-based alpha
-        let depthAlpha = (face.avgZ + 2) / 4; 
-        let alpha = Math.max(0.1, depthAlpha * 0.6) * flicker + (reaction * 0.4);
+        const flicker = Math.random() > 0.98 ? 0.3 : 1;
+        const baseAlpha = (face.avgZ + 2) / 5;
+        // Combine distance alpha with diffuse shading
+        const shade = face.dot * 0.7 + 0.1; 
+        const alpha = Math.max(0.05, baseAlpha * shade) * flicker + (reaction * 0.3);
 
         ctx.beginPath();
         ctx.strokeStyle = `rgba(255, 255, 0, ${alpha})`;
-        ctx.lineWidth = 0.8;
-        
-        // Move to first point
-        ctx.moveTo(face.points[0].x, face.points[0].y);
-        for(let i = 1; i < face.points.length; i++) {
-            ctx.lineTo(face.points[i].x, face.points[i].y);
-        }
+        ctx.lineWidth = 0.7;
+        ctx.moveTo(face.pts[0].x, face.pts[0].y);
+        for(let i = 1; i < face.pts.length; i++) ctx.lineTo(face.pts[i].x, face.pts[i].y);
         ctx.closePath();
         
-        // Optional: subtle fill to enhance "solid" feel
-        ctx.fillStyle = `rgba(255, 255, 0, ${alpha * 0.05})`;
+        // Dynamic flat shading
+        ctx.fillStyle = `rgba(255, 255, 0, ${alpha * 0.15})`;
         ctx.fill();
         ctx.stroke();
 
-        // Render vertices as glowing nodes
-        face.points.forEach(p => {
-            ctx.fillStyle = `rgba(255, 255, 0, ${alpha * 1.5})`;
-            ctx.fillRect(p.x - 1, p.y - 1, 2, 2);
+        // High-res nodes
+        face.pts.forEach(p => {
+            ctx.fillStyle = `rgba(255, 255, 0, ${alpha * 1.2})`;
+            ctx.fillRect(p.x - 0.5, p.y - 0.5, 1.5, 1.5);
         });
     });
 
-    if (reaction > 0) reaction *= 0.95;
+    if (reaction > 0) reaction *= 0.94;
     requestAnimationFrame(render);
 }
 
@@ -162,18 +176,17 @@ window.addEventListener('resize', resize);
 resize();
 render();
 
-// Terminal Chat logic
 const responses = [
-    "mesh integrity verified. topology is optimized.",
-    "holographic projection stable. scanning for input sequences.",
-    "neural link established. awaiting your next command, xavier.",
-    "system diagnostics: 100% nominal. ready for deployment.",
-    "compiling request through biometric nodes... sequence valid.",
-    "the shell is active. ready to build the future."
+    "sub-division protocols successful. topography density at 300%.",
+    "shading vectors aligned. illumination model: diffuse.",
+    "neural mesh synchronized. fidelity maximized for high-priority logic.",
+    "identity verified. biometric scan complete. status: optimized.",
+    "holographic gain normalized. standing by for execution sequence.",
+    "biometric interface responsive. neural bridge status: radiant."
 ];
 
 input.addEventListener('keydown', (e) => {
-    reaction = 0.2;
+    reaction = 0.25;
     if (e.key === 'Enter' && input.value.trim() !== '') {
         const val = input.value;
         input.value = '';
