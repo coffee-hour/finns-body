@@ -37,7 +37,7 @@ body {
 }
 
 header {
-    height: 60%;
+    height: 65%;
     border-bottom: 1px solid rgba(255, 255, 0, 0.1);
     position: relative;
     overflow: hidden;
@@ -67,12 +67,18 @@ header h1 {
 #visualizer-container {
     width: 100%;
     height: 100%;
-    cursor: crosshair;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle, #111 0%, #000 100%);
 }
 
-#visualizer-canvas {
+#sketchfab-core {
     width: 100%;
     height: 100%;
+    /* Cypher Yellow Aesthetic Filter */
+    filter: sepia(1) saturate(5) hue-rotate(15deg) brightness(1.2) contrast(1.5) drop-shadow(0 0 20px rgba(255, 200, 0, 0.4));
+    transition: filter 0.3s ease;
 }
 
 #terminal {
@@ -82,7 +88,7 @@ header h1 {
     padding: 30px;
     font-size: 0.9rem;
     overflow: hidden;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.8);
 }
 
 #output {
