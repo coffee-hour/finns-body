@@ -1,17 +1,12 @@
-# Cypher Terminal v4.0.0
+# Cypher Terminal v5.0.0
 
-Masterclass interactive humanoid visualization and digital shell.
+High-fidelity interactive 3D face-mesh visualization.
 
 ## Technical Specifications
-- **Visualizer:** Custom-built 3D projection engine in vanilla JavaScript.
-- **Graphic Mode:** Holographic point-cloud with vector mesh interpolation.
-- **Interactivity:** Real-time 3D rotation, mouse-tracking head orientation, and transmission-reactive pulsing.
-- **Voice Protocol:** Professional, tech-focused mentor persona (zero slang).
-
-## Project Structure
-- `index.html`: Optimized semantic layout with a dedicated Canvas container.
-- `styles.css`: Dark carbon aesthetic with cyber-yellow accents and depth-simulated gradients.
-- `script.js`: Core 3D engine, projection math, and terminal logic.
+- **Visualizer:** Advanced 3D projection engine featuring a high-detail face-mesh (eyes, nose, mouth, jawline).
+- **Geometry:** Point-cloud and wireframe mesh with biometric-style depth rendering.
+- **Interactivity:** Real-time facial rotation and gaze tracking (follows mouse movement).
+- **Voice Protocol:** 100% tech-focused hacker persona. Zero slang.
 
 ## Deployment
-Compatible with all static hosting providers (Cloudflare Pages, Vercel, etc.). Simply connect this repository for an instant, masterclass deployment.
+Compatible with all static hosting providers. Connect this repository for an immediate, high-fidelity deployment.
