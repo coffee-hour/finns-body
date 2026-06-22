@@ -12,7 +12,7 @@ let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
 let reaction = 0, rotationY = 0, frame = 0;
 let lastMessageId = 0;
 
-const WORKER_URL = "https://cypherlink-public.xaviersgames.workers.dev/api/messages";
+const WORKER_URL = "https://cypherlink.xaviersgames.workers.dev/api/messages";
 
 const lerp = (a, b, n) => (1 - n) * a + n * b;
 const MESH = { vertices: [], faces: [] };
