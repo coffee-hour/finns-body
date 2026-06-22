@@ -1,7 +1,7 @@
 /**
- * CYPHER TERMINAL v16.0.0
+ * CYPHER TERMINAL v17.0.0
  * Masterclass Cyber-Skull Engine
- * High-Fidelity Anatomical Low-Poly Mesh
+ * High-Fidelity Anatomical Low-Poly Mesh with Optimized Mandible
  */
 
 const canvas = document.getElementById('visualizer-canvas');
@@ -16,14 +16,14 @@ const lerp = (a, b, n) => (1 - n) * a + n * b;
 
 const MESH = { vertices: [], faces: [] };
 
-function initMasterclassSkull() {
+function initUltimateSkull() {
     const v = MESH.vertices;
     const f = MESH.faces;
 
-    // 1. ANATOMICAL CRANIUM (Beautifully rounded)
+    // 1. ANATOMICAL CRANIUM
     const rows = 8, cols = 12;
     for(let r=0; r<=rows; r++) {
-        let phi = (r/rows) * (Math.PI/1.6); // Top half bulge
+        let phi = (r/rows) * (Math.PI/1.6);
         for(let c=0; c<cols; c++) {
             let theta = (c/cols) * Math.PI * 2;
             let radius = 0.88;
@@ -43,32 +43,39 @@ function initMasterclassSkull() {
         }
     }
 
-    // 2. REFINED FACIAL MESH
+    // 2. ULTIMATE FACIAL & MANDIBLE MESH
     const b = v.length;
-    // Eye Sockets (Deep Recess)
+    // Eye Sockets
     v.push({x:0.3, y:0.2, z:0.5}, {x:-0.3, y:0.2, z:0.5}); // 0,1: Deep Inner
     v.push({x:0.45, y:0.45, z:0.85}, {x:-0.45, y:0.45, z:0.85}); // 2,3: Brow
     v.push({x:0.45, y:-0.1, z:0.85}, {x:-0.45, y:-0.1, z:0.85}); // 4,5: Cheek top
     v.push({x:0, y:0.2, z:0.9}); // 6: Bridge
     
-    // Nose Cavity (Inverted Heart)
+    // Nose Cavity
     v.push({x:0, y:0, z:1.0}, {x:0.12, y:-0.2, z:0.95}, {x:-0.12, y:-0.2, z:0.95}); // 7,8,9
     
-    // Cheekbones (Stylized Flare)
+    // Cheekbones (Flare out)
     v.push({x:0.8, y:0.1, z:0.3}, {x:-0.8, y:0.1, z:0.3}); // 10,11
     
-    // Jaw & Teeth (Segmented/Realistic protrusion)
-    v.push({x:0.25, y:-0.45, z:0.85}, {x:-0.25, y:-0.45, z:0.85}); // 12,13: Maxilla Teeth
-    v.push({x:0.22, y:-0.75, z:0.8}, {x:-0.22, y:-0.75, z:0.8}, {x:0, y:-0.85, z:0.88}); // 14,15,16: Chin
+    // Mandible/Jaw Recalibration
+    // Upper Teeth/Maxilla
+    v.push({x:0.28, y:-0.4, z:0.85}, {x:-0.28, y:-0.4, z:0.85}); // 12,13
+    v.push({x:0.1, y:-0.45, z:1.0}, {x:-0.1, y:-0.45, z:1.0}); // 14,15 (Center teeth)
+    
+    // Lower Mandible (Narrower taper)
+    v.push({x:0.5, y:-0.3, z:0.1}, {x:-0.5, y:-0.3, z:0.1}); // 16,17: Jaw Hinge (Back)
+    v.push({x:0.2, y:-0.75, z:0.75}, {x:-0.2, y:-0.75, z:0.75}); // 18,19: Chin base
+    v.push({x:0, y:-0.9, z:0.88}); // 20: Mental Protuberance (Chin Tip)
 
-    // Face Connectors
-    f.push([b+2, b+0, b+6], [b+3, b+6, b+1]); // Upper sockets
-    f.push([b+0, b+4, b+12], [b+1, b+13, b+5]); // Socket side to jaw
+    // Connectors
+    f.push([b+2, b+0, b+6], [b+3, b+6, b+1]); // Sockets
     f.push([b+7, b+8, b+9]); // Nose
-    f.push([b+4, b+10, b+12], [b+5, b+13, b+11]); // Cheek flare
-    f.push([b+12, b+14, b+16], [b+13, b+16, b+15]); // Jaw/Chin structure
+    f.push([b+10, b+16, b+18], [b+11, b+17, b+19]); // Jaw Hinge to Chin Taper
+    f.push([b+12, b+14, b+13], [b+14, b+15, b+13]); // Upper Teeth Row
+    f.push([b+18, b+20, b+19]); // Chin Projection
+    f.push([b+12, b+18, b+20], [b+13, b+19, b+20]); // Jaw Side to Chin
 
-    // 3. ENHANCED GYRO-RINGS (Precise Origin)
+    // 3. GYRO-RINGS
     const addRing = (radius, axis, speed) => {
         const segs = 48;
         const start = v.length;
@@ -112,7 +119,6 @@ function render() {
     const proj = MESH.vertices.map(v => project(v));
     const faces = MESH.faces.map(idx => {
         const pts = idx.map(i => proj[i]);
-        // Centroid-based sorting
         const z = pts.reduce((s,p)=>s+p.z,0)/pts.length;
         const v1 = {x:pts[1].wx-pts[0].wx, y:pts[1].wy-pts[0].wy, z:pts[1].wz-pts[0].wz};
         const v2 = {x:pts[2].wx-pts[0].wx, y:pts[2].wy-pts[0].wy, z:pts[2].wz-pts[0].wz};
@@ -142,9 +148,9 @@ window.addEventListener('mousemove', (e) => {
 });
 function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
 window.addEventListener('resize', resize);
-resize(); initMasterclassSkull(); render();
+resize(); initUltimateSkull(); render();
 
-const rList = ["topology perfected.", "skull sync 100%.", "standing by, xavier."];
+const rList = ["topology perfected.", "mandible recalibrated.", "standing by, xavier."];
 input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && input.value.trim() !== '') {
         const val = input.value; input.value = ''; reaction = 1.0;
