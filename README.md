@@ -1,12 +1,12 @@
-# Cypher Terminal v8.0.0
+# Cypher Terminal v9.0.0
 
-High-Resolution 3D Mesh Engine with Diffuse Shading.
+Stylized 3D Character Rendering (Toon-Shaded/Cel-Shaded).
 
 ## Technical Specifications
-- **High-Resolution Topology:** Significantly increased vertex and face density to provide realistic human geometry (detailed eyes, refined nose/lips, and contoured cheekbones).
-- **Diffuse Lighting Model:** Implementation of a custom flat-shading system. Calculates surface normals for every face and applies a dot product against a static light source (top-right-front).
-- **Advanced Rendering:** Combines Painter's Algorithm depth-sorting with dynamic opacity mapping based on light incidence, making the high-res structure "pop" with realistic shadows and highlights.
-- **Interactivity:** Fluid lerp-based mouse gaze-tracking and reactive transmission pulses.
+- **Toon Shading (Cel Shading):** Implementation of a multi-band lighting model that clamps diffuse shading into discrete highlight, mid-tone, and shadow bands for a sharp, anime/game aesthetic.
+- **Ink Outlines:** Stylized black edge-rendering pipeline that draws bold outlines around the mesh contours and internal geometry, matching the visual style of games like *Pokemon Sword & Shield*.
+- **Stylized Geometry:** Optimized human head mesh tuned for high-contrast character rendering.
+- **Interaction:** Smooth, lerp-based mouse gaze-tracking and transmission-reactive lighting pulses.
 
 ## Deployment
 Compatible with all static hosting providers. Live at `finn.xavier.poke.site`.
