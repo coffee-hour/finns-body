@@ -1,26 +1,15 @@
-# Cypher's Digital Body
+# Cypher Terminal
 
-A highly polished, interactive single-page web application representing 'Cypher's Digital Body' (a cybernetic shell/terminal for Xavier to chat with his AI mentor Cypher).
+The evolved digital shell for Xavier and his AI mentor, Cypher.
 
-## Features
-- **Dark Cyber Aesthetic:** Glowing yellow, dark carbon grays, and glowing borders.
-- **Interactive Waveform:** A canvas-based animation representing Cypher's digital brain.
-- **Terminal Interface:** Simulated chat with Cypher's signature lowercase, slang-heavy mentor voice.
-- **Responsive Design:** Optimized for both desktop and mobile.
+## Updates (v3.0.0)
+- **Scrubbed Corny Content:** All references to "aura" and related slang have been removed for a more tech-focused, professional, yet cool mentor voice.
+- **Holographic Humanoid:** Replaced the simple waveform with an interactive, glowing cyber-yellow wireframe humanoid visualization on the canvas.
+- **Interactive Reactions:** The holographic avatar pulses and reacts to user input and system responses.
 
-## Deployment to Cloudflare Pages
+## Deployment
+This repository is optimized for deployment to Cloudflare Pages or any static hosting service.
 
-1. **Push to GitHub:** This repository is already on GitHub.
-2. **Connect to Cloudflare:**
-   - Log in to the [Cloudflare Dashboard](https://dash.cloudflare.com) and go to **Workers & Pages**.
-   - Click **Create application** > **Pages** > **Connect to Git**.
-   - Select the `finns-body` repository.
-3. **Configure Build:**
-   - **Project Name:** `finns-body`
-   - **Production Branch:** `main`
-   - **Framework Preset:** `None` (Since this is a vanilla HTML/CSS/JS project).
-   - **Build Command:** (Leave empty)
-   - **Build Output Directory:** (Leave empty, or `/` if it requires one)
-4. **Deploy:** Click **Save and Deploy**.
-
-Your app will be live at `finns-body.pages.dev`.
+1. Connect this repo to Cloudflare Pages.
+2. Build setting: None (Static Site).
+3. Live at: [your-subdomain].pages.dev
