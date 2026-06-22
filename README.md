@@ -1,12 +1,13 @@
-# Cypher Terminal v9.0.0
+# Cypher Terminal v10.0.0
 
-Stylized 3D Character Rendering (Toon-Shaded/Cel-Shaded).
+Solid Volumetric 3D Character Rendering.
 
 ## Technical Specifications
-- **Toon Shading (Cel Shading):** Implementation of a multi-band lighting model that clamps diffuse shading into discrete highlight, mid-tone, and shadow bands for a sharp, anime/game aesthetic.
-- **Ink Outlines:** Stylized black edge-rendering pipeline that draws bold outlines around the mesh contours and internal geometry, matching the visual style of games like *Pokemon Sword & Shield*.
-- **Stylized Geometry:** Optimized human head mesh tuned for high-contrast character rendering.
-- **Interaction:** Smooth, lerp-based mouse gaze-tracking and transmission-reactive lighting pulses.
+- **Opaque Rendering Pipeline:** Elimination of all holographic transparency. Mesh faces are now rendered with 100% opacity, creating a solid, physical-looking 3D model.
+- **Strict Depth Occlusion:** Implementation of a strict Painter's Algorithm (back-to-front sorting) combined with solid fills to perfectly hide back-facing geometry and internal wireframes.
+- **Toon Shading (Cel Shading):** Opaque color bands (Highlight, Mid-tone, Shadow) applied based on lighting incidence.
+- **Stylized Ink Outlines:** Bold black edge-rendering on top of solid volumetric forms.
+- **Interaction:** Preserved lerp-based mouse gaze-tracking and rotation.
 
 ## Deployment
 Compatible with all static hosting providers. Live at `finn.xavier.poke.site`.

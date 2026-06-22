@@ -1,7 +1,7 @@
 /**
- * CYPHER TERMINAL v9.0.0
- * Toon-Shaded (Cel-Shaded) 3D Engine
- * Stylized Ink Outlines & Clamped Lighting
+ * CYPHER TERMINAL v10.0.0
+ * Solid Opaque 3D Engine
+ * Toon-Shaded Volumetric Mesh (Non-Transparent)
  */
 
 const canvas = document.getElementById('visualizer-canvas');
@@ -16,7 +16,7 @@ let rotationY = 0;
 
 const lerp = (a, b, n) => (1 - n) * a + n * b;
 
-// High-Resolution Mesh (v8 base, v9 tuned for cel shading)
+// Optimized Mesh Dataset
 const MESH = {
     vertices: [
         {x: 0, y: 1.15, z: 0}, {x: 0.3, y: 1.05, z: 0.5}, {x: -0.3, y: 1.05, z: 0.5},
@@ -99,38 +99,34 @@ function render() {
         });
 
         const dot = normal.x * normalizedLight.x + normal.y * normalizedLight.y + normal.z * normalizedLight.z;
-        
         return { pts, avgZ, dot };
     });
 
+    // Painter's Algorithm: Sort by Z-depth (Back to Front) for strict occlusion
     faceData.sort((a, b) => b.avgZ - a.avgZ);
 
     faceData.forEach(face => {
-        const flicker = Math.random() > 0.98 ? 0.3 : 1;
-        const baseAlpha = (face.avgZ + 2) / 5;
-
-        // Cel Shading Logic (Clamped Bands)
-        let celColor;
+        // Cel Shading: Fully opaque solid colors (no alpha)
+        let fillColor;
         if (face.dot > 0.6) {
-            celColor = `rgba(255, 255, 0, ${0.9 * flicker + reaction})`; // Highlight
+            fillColor = `rgb(255, 255, 0)`; // Highlight
         } else if (face.dot > 0.1) {
-            celColor = `rgba(255, 255, 0, ${0.6 * flicker + reaction})`; // Mid-tone
+            fillColor = `rgb(200, 200, 0)`; // Mid-tone
         } else {
-            celColor = `rgba(180, 150, 0, ${0.3 * flicker})`; // Shadow
+            fillColor = `rgb(100, 100, 0)`; // Shadow
         }
 
-        // Draw Stylized Face
+        // Draw Solid Face Fill
         ctx.beginPath();
-        ctx.fillStyle = celColor;
+        ctx.fillStyle = fillColor;
         ctx.moveTo(face.pts[0].x, face.pts[0].y);
         for(let i = 1; i < face.pts.length; i++) ctx.lineTo(face.pts[i].x, face.pts[i].y);
         ctx.closePath();
         ctx.fill();
 
-        // Stylized Ink Outlines (Pokemon Style)
+        // Draw Ink Outlines on top
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 1.5;
-        ctx.lineJoin = 'round';
         ctx.stroke();
     });
 
@@ -154,10 +150,9 @@ resize();
 render();
 
 const responses = [
-    "stylized render pipeline synchronized. toon-shading bands active.",
-    "ink outlines verified. biometric fidelity tuned for high contrast.",
+    "opaque rendering pipeline synchronized. solid body active.",
     "neural bridge operational. ready for instructions, xavier.",
-    "ident confirmed. character mesh v9.0.0 is stable.",
+    "ident confirmed. character mesh v10.0.0 is stable.",
     "logic gates clear. standing by for execution sequence."
 ];
 
